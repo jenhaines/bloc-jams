@@ -135,35 +135,6 @@ body.landing .navbar {
 .collection-album-container .collection-overlay-button .fa-play {
   padding-left: 5px; }
 
-.album-song-button {
-  text-align: center;
-  font-size: 14px;
-  background-color: white;
-  color: #d2287b;
-  border-radius: 50% 50%;
-  display: inline-block;
-  width: 28px;
-  height: 28px; }
-
-.album-song-button:hover {
-  cursor: pointer;
-  color: white;
-  background-color: #d2287b; }
-
-.album-song-button i {
-  line-height: 28px; }
-
-.album-song-button .fa-play {
-  padding-left: 5px; }
-
-.album-song-listing td {
-  vertical-align: middle; }
-
-td.song-number {
-  padding: 0;
-  height: 70px;
-  text-align: center; }
-
 .player-bar {
   position: fixed;
   bottom: 0;
@@ -200,25 +171,17 @@ td.song-number {
   vertical-align: middle; }
 
 .player-bar .play-controls .previous {
-  margin-right: 65px; 
-  transition: all 100ms ease-in-out;}
-
-.previous:hover {
-  opacity: 0.5;}
-
-.player-bar .play-controls .next {
-  transition: all 100ms ease-in-out;}
-
-.play-pause:hover {
-  opacity: 0.5;}
-
-.next:hover {
-  opacity: 0.5; }
+  margin-right: 65px; }
 
 .player-bar .play-controls .play-pause {
   margin-right: 60px;
-  font-size: 30px; 
-  transition: all 100ms ease-in-out;}
+  font-size: 30px; }
+
+.play-pause:hover, .next:hover, .previous:hover {
+  opacity: 0.5; }
+
+.player-bar .play-controls .next {
+  transition: all 100ms ease-in-out; }
 
 .player-bar .currently-playing {
   width: 50%;
