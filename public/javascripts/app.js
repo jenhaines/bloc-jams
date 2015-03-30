@@ -475,6 +475,23 @@ blocJams.directive('slider', function(){
     }
    };
  });
+
+blocJams.directive('clickMe',function(){
+  return {
+    restrict: 'E',
+    replace: true,
+    template: '<h3>click me</h3>',
+    link: function(scope, element, attributes) {
+      $(element).click(function(event){
+          alert('Thanks For clicking!');
+      });
+
+    }
+  };
+});
+
+
+
 });
 
 ;require.register("scripts/collection", function(exports, require, module) {
