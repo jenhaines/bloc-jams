@@ -261,10 +261,7 @@ if (document.URL.match(/\/album.html/)) {
 });
 
 ;require.register("scripts/app", function(exports, require, module) {
-//require('./landing');
-//require('./album');
-//require('./collection');
-//require('./profile');
+
 
 // Example Album
  var albumPicasso = {
@@ -374,107 +371,117 @@ blocJams.controller('Collection.controller', ['$scope', 'SongPlayer', function($
    $scope.songPlayer = SongPlayer;
  }]);
  
- blocJams.service('SongPlayer', function() {
+blocJams.service('SongPlayer', function() {
   var currentSoundFile = null;
 
-    var trackIndex = function(album, song) {
-       return album.songs.indexOf(song);
-     };
-   return {
-     currentSong: null,
-     currentAlbum: null,
-     playing: false,
- 
-     play: function() {
-       this.playing = true;
-       currentSoundFile.play();
-     },
-     pause: function() {
-       this.playing = false;
-       currentSoundFile.pause();
-     },
-     next: function() {
-       var currentTrackIndex = trackIndex(this.currentAlbum, this.currentSong);
-       currentTrackIndex++;
-       if (currentTrackIndex >= this.currentAlbum.songs.length) {
-         currentTrackIndex = 0;
-       }
-       var song = this.currentAlbum.songs[currentTrackIndex];
-        this.setSong(this.currentAlbum, song);
-       this.currentSong = this.currentAlbum.songs[currentTrackIndex];
-     },
-     previous: function() {
-       var currentTrackIndex = trackIndex(this.currentAlbum, this.currentSong);
-       currentTrackIndex--;
-       if (currentTrackIndex < 0) {
-         currentTrackIndex = this.currentAlbum.songs.length - 1;
-       }
-       var song = this.currentAlbum.songs[currentTrackIndex];
-        this.setSong(this.currentAlbum, song);
- 
-       this.currentSong = this.currentAlbum.songs[currentTrackIndex];
-     },
-     setSong: function(album, song) {
+  var trackIndex = function(album, song) {
+    return album.songs.indexOf(song);
+  };
+
+  return {
+    currentSong: null,
+    currentAlbum: null,
+    playing: false,
+
+    play: function() {
+      this.playing = true;
+      currentSoundFile.play();
+    },
+    pause: function() {
+      this.playing = false;
+      currentSoundFile.pause();
+    },
+    next: function() {
+      var currentTrackIndex = trackIndex(this.currentAlbum, this.currentSong);
+      currentTrackIndex++;
+      if (currentTrackIndex >= this.currentAlbum.songs.length) {
+        currentTrackIndex = 0;
+      }
+      var song = this.currentAlbum.songs[currentTrackIndex];
+      this.setSong(this.currentAlbum, song);
+      this.currentSong = this.currentAlbum.songs[currentTrackIndex];
+    },
+    previous: function() {
+      var currentTrackIndex = trackIndex(this.currentAlbum, this.currentSong);
+      currentTrackIndex--;
+      if (currentTrackIndex < 0) {
+        currentTrackIndex = this.currentAlbum.songs.length - 1;
+      }
+      var song = this.currentAlbum.songs[currentTrackIndex];
+      this.setSong(this.currentAlbum, song);
+
+      this.currentSong = this.currentAlbum.songs[currentTrackIndex];
+    },
+    setSong: function(album, song) {
       if (currentSoundFile) {
-          currentSoundFile.stop();
-        }
-       this.currentAlbum = album;
-       this.currentSong = song;
-       currentSoundFile = new buzz.sound(song.audioUrl, {
-         formats: [ "mp3" ],
-         preload: true
-       });
-    
-       this.play();
-     }
-   };
- });
-
-blocJams.directive('slider', function(){
-
-  var updateSeekPercentage = function($seekBar, event) {
-     var barWidth = $seekBar.width();
-     var offsetX =  event.pageX - $seekBar.offset().left;
- 
-     var offsetXPercent = (offsetX  / $seekBar.width()) * 100;
-     offsetXPercent = Math.max(0, offsetXPercent);
-     offsetXPercent = Math.min(100, offsetXPercent);
- 
-     var percentageString = offsetXPercent + '%';
-     $seekBar.find('.fill').width(percentageString);
-     $seekBar.find('.thumb').css({left: percentageString});
-   }
-
-   return {
-     templateUrl: '/templates/directives/slider.html', // We'll create these files shortly.
-     replace: true,
-     restrict: 'E',
-     link: function(scope, element, attributes) {
- 
-      var $seekBar = $(element);
- 
-      $seekBar.click(function(event) {
-        updateSeekPercentage($seekBar, event);
+        currentSoundFile.stop();
+      }
+      this.currentAlbum = album;
+      this.currentSong = song;
+      currentSoundFile = new buzz.sound(song.audioUrl, {
+        formats: [ "mp3" ],
+        preload: true
       });
- 
-      $seekBar.find('.thumb').mousedown(function(event){
-        $seekBar.addClass('no-animate');
- 
-        $(document).bind('mousemove.thumb', function(event){
-          updateSeekPercentage($seekBar, event);
-        });
- 
-        //cleanup
-        $(document).bind('mouseup.thumb', function(){
-          $seekBar.removeClass('no-animate');
-          $(document).unbind('mousemove.thumb');
-          $(document).unbind('mouseup.thumb');
-        });
- 
-      });
+      this.play();
     }
-   };
- });
+  };
+});
+
+blocJams.directive('slider', ['$document',function(){
+  
+  var calculateSliderPercentFromMouseEvent = function($slider, event) {
+    var offsetX =  event.pageX - $slider.offset().left; // Distance from left
+    var sliderWidth = $slider.width(); // Width of slider
+    var offsetXPercent = (offsetX  / sliderWidth);
+    offsetXPercent = Math.max(0, offsetXPercent);
+    offsetXPercent = Math.min(1, offsetXPercent);
+    return offsetXPercent;
+  }
+
+  return {
+    templateUrl: '/templates/directives/slider.html', // We'll create these files shortly.
+    replace: true,
+    restrict: 'E',
+    scope: {},
+    link: function(scope, element, attributes) {
+
+      scope.value = 0;
+      scope.max = 200;
+      var $seekBar = $(element);
+
+      var percentString = function () {
+        var percent = Number(scope.value) / Number(scope.max) * 100;
+        return percent + "%";
+      }
+
+      scope.fillStyle = function() {
+        return {width: percentString()};
+      }
+
+      scope.thumbStyle = function() {
+        return {left: percentString()};
+      }
+
+      scope.onClickSlider = function(event) {
+        var percent = calculateSliderPercentFromMouseEvent($seekBar, event);
+        scope.value = percent * scope.max;
+      }
+
+      scope.trackThumb = function() {
+        $document.bind('mousemove.thumb', function(event){
+          var percent = calculateSliderPercentFromMouseEvent($seekBar, event);
+          scope.$apply(function(){
+            scope.value = percent * scope.max;
+          });
+        });
+        $document.bind('mouseup.thumb', function(){
+          $document.unbind('mousemove.thumb');
+          $document.unbind('mouseup.thumb');
+        });
+      }
+    }
+  };
+}]);
 });
 
 ;require.register("scripts/collection", function(exports, require, module) {
