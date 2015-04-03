@@ -490,6 +490,27 @@ blocJams.directive('clickMe',function(){
   };
 });
 
+blocJams.directive('countHoverTime', ['$interval', function($interval) {
+  return {
+    restrict: 'E',
+    replace: true,
+    template: '<h3>hover over me</h3>',
+    link: function(scope, element, attributes) {
+      var timer = null;
+      var time = 0;
+      $(element).on('mouseenter', function(event){
+          timer = $interval(function() {
+            time++;
+          }, 1000);
+      }).on('mouseleave', function() {
+        $interval.cancel(timer);
+        console.log(time);
+      });
+
+    }
+  };
+}]);
+
 
 
 });
