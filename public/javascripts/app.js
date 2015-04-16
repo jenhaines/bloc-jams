@@ -372,6 +372,7 @@ blocJams.controller('Collection.controller', ['$scope', 'SongPlayer', function($
 
    $scope.volumeClass = function() {
      return {
+      'fa-microphone-slash' : SongPlayer.muted,
        'fa-volume-off': SongPlayer.volume == 0,
        'fa-volume-down': SongPlayer.volume <= 70 && SongPlayer.volume > 0,
        'fa-volume-up': SongPlayer.volume > 70
@@ -400,8 +401,8 @@ blocJams.service('SongPlayer', ['$rootScope', function($rootScope) {
     volume: 90,
 
     play: function() {
-      this.playing = true;
       currentSoundFile.play();
+      this.playing = true;
     },
     pause: function() {
       this.playing = false;
@@ -435,15 +436,26 @@ blocJams.service('SongPlayer', ['$rootScope', function($rootScope) {
          currentSoundFile.setTime(time);
        }
      },
-      onTimeUpdate: function(callback) {
-        return $rootScope.$on('sound:timeupdate', callback);
-      },
-      setVolume: function(volume) {
-        if(currentSoundFile){
-          currentSoundFile.setVolume(volume);
-        }
-        this.volume = volume;
-      },
+    onTimeUpdate: function(callback) {
+      return $rootScope.$on('sound:timeupdate', callback);
+    },
+    setVolume: function(volume) {
+      if(currentSoundFile){
+        currentSoundFile.setVolume(volume);
+      }
+      this.volume = volume;
+    },
+
+    toggleMute: function(){
+      if(this.volume === 0) {
+        this.setVolume(this.previousVolume);
+        this.muted = false;
+      } else {
+        this.previousVolume = this.volume;
+        this.muted = true;
+        this.setVolume(0)
+      }
+    },
 
     setSong: function(album, song) {
       if (currentSoundFile) {
